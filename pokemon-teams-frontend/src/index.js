@@ -50,18 +50,18 @@ function mainEventListener(){
 
       let pokeId=event.target.dataset.pokemonId
       let trainerId=event.target.parentElement.parentElement.previousElementSibling.dataset.trainerId
-       releasePokemon(pokeId,trainerId)
+       releasePokemon(pokeId,trainerId,event.target)
     }
     else if (event.target.innerText==="Add Pokemon"){
       //if children of ul !=6 addpokemon
       if(event.target.nextElementSibling.children.length!=6)
-      addPokemon(event.target.dataset.trainerId)
+      addPokemon(event.target.dataset.trainerId,event.target)
     }
   })
 }
 
 
-function addPokemon(trainerId){
+function addPokemon(trainerId,target){
   data={
     trainer_id:trainerId
   }
@@ -75,14 +75,23 @@ function addPokemon(trainerId){
       JSON.stringify(data)
 
   }).then(res=>res.json())
-    .then(fetchTrainersWPokemon())
+    .then(json=>addPokemonToUl(json,target))
 }
 
-function releasePokemon(pokeId,trainerId){
+function releasePokemon(pokeId,trainerId,target){
+  target.parentElement.remove()
   console.log("in releasePokemon");
   fetch(`${POKEMONS_URL}/${pokeId}`,{
     method: "DELETE",
 
   }).then(res=>res.json())
-    .then(fetchTrainersWPokemon())
+
+}
+
+function addPokemonToUl(pokemon,target){
+  let newLi=document.createElement('li')
+  newLi.innerHTML=`${pokemon.nickname} (${pokemon.species}) <button class="release" data-pokemon-id="${pokemon.id}">Release</button>`
+  let trainerButton=document.querySelector('body > main > div:nth-child(1) > button')
+
+  target.nextElementSibling.appendChild(newLi)
 }
